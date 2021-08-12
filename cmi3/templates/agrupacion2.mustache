@@ -1,0 +1,153 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+
+{{!
+    @template block_inicial/segmento
+    Example context (json):
+    {
+    }
+}}
+
+
+
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/datetime/1.0.3/css/dataTables.dateTime.min.css">
+
+
+<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/datetime/1.0.3/js/dataTables.dateTime.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"></script>
+
+<body>
+
+  <table border="0" cellspacing="5" cellpadding="5">
+          <tbody><tr>
+              <td>Fecha Minima:</td>
+              <td><input type="text" id="min" name="min"></td>
+          </tr>
+          <tr>
+              <td>Fecha Maxima:</td>
+              <td><input type="text" id="max" name="max"></td>
+          </tr>
+      </tbody></table>
+     <table  border="6.8"  id="example" class="display" style="width:50% ">
+       <thead>
+         <tr>
+           <th>Numeracion</th>
+           <th>Fecha Activado</th>
+           <th>codigo_curso</th>
+           <th>curso</th>
+           <th>modalidad</th>
+           <th>Agenda de aprendizaje</th>
+           <th>Tipo de curso</th>
+           <th>segmento Dirigido</th>
+           <th>Unidad de negocio</th>
+           <th>Población dirigida</th>
+           <th>País</th>
+           <th>Codigo PG</th>
+           <th>Facilitador</th>
+           <th>Agrupacion</th>
+           <th>Correo</th>
+           <th>HRBD</th>
+           <th>Seccion</th>
+           <th>asistencia</th>
+           <th>Nota</th>
+           <th>Fecha Finalización</th>
+         </tr>
+       </thead>
+       <tbody>
+        {{#agrupaciones}}
+        <td><a>{{id}}</a></td>
+            <td><a>{{fecha_activado}}</a></td>
+            <td><a>{{codigo_curso}}</a></td>
+            <td><a>{{curso}}</a></td>
+            <td><a>{{modalidad}}</a></td>
+            <td><a>{{agenda_de_aprendizaje}}</a></td>
+            <td><a>{{tipo_de_curso}}</a></td>
+            <td><a>{{segmento_dirigido}}</a></td>
+            <td><a>{{un}}</a></td>
+            <td><a>{{poblacion_dirigida}}</a></td>
+            <td><a>{{pais}}</a></td>
+            <td><a>{{codigopg}}</a></td>
+            <td><a>{{facilitador}}</a></td>
+            <td><a>{{agrupacion}}</a></td>
+            <td><a>{{correo}}</a></td>
+            <td><a>{{hrbp}}</a></td>
+            <td><a>{{seccion}}</a></td>
+            <td><a>{{asistencia}}</a></td>
+            <td><a>{{nota}}</a></td>
+            <td><a>{{fecha_finalizacion}}</a></td>
+            </tr>
+        {{/agrupaciones}}
+        </tbody>
+    </table>
+</body>
+
+<script>
+var minDate, maxDate;
+
+// Custom filtering function which will search data in column four between two values
+$.fn.dataTable.ext.search.push(
+    function( settings, data, dataIndex ) {
+        var min = minDate.val();
+        var max = maxDate.val();
+        var date = new Date( data[19] );
+
+        if (
+            ( min === null && max === null ) ||
+            ( min === null && date <= max ) ||
+            ( min <= date   && max === null ) ||
+            ( min <= date   && date <= max )
+        ) {
+            return true;
+        }
+        return false;
+    }
+);
+
+$(document).ready(function() {
+    // Create date inputs
+    minDate = new DateTime($('#min'), {
+        format: 'MMMM Do YYYY'
+    });
+    maxDate = new DateTime($('#max'), {
+        format: 'MMMM Do YYYY'
+    });
+
+    // DataTables initialisation
+    var table = $('#example').DataTable({
+      aoColumnDefs: [
+          {"aTargets": [0], "bSortable": true},
+          {"aTargets": [2], "asSorting": ["asc"], "bSortable": true},
+      ],
+      "language": {
+          "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+      }
+    });
+    // Refilter the table
+    $('#min, #max').on('change', function () {
+        table.draw();
+    });
+
+});
+</script>
